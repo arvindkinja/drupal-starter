@@ -12,6 +12,7 @@ use Drupal\server_general\SocialShareTrait;
 use Drupal\server_general\TitleAndLabelsTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Link;
 
 /**
  * The "Node Group" plugin.
@@ -66,9 +67,13 @@ class NodeGroup extends NodeViewBuilderAbstract {
     $elements = [];
     // Show a group subscribe message to user if they are logged in.
     if ($this->account->isAuthenticated()) {
-      $this->messenger()->addMessage(t('Hi %name, click here if you would like to subscribe to this group called %label',
+      // Set the subscribe URL.
+      $url = Link::createFromRoute(t('click here'), 'og.subscribe', ['entity_type_id' => 'node', 'group' => $entity->id()]);
+      $membershipUrl = $url->toString();
+      $this->messenger()->addMessage(t('Hi %name, %url if you would like to subscribe to this group called %label',
       [
         '%name' => $this->account->getDisplayName(),
+        '%url' => $membershipUrl,
         '%label' => $entity->label(),
       ]));
     }
